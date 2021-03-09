@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1615326976 source:c:\users\cliente\documents\controlador_de_estoque\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<locale.h>
+	<ctype.h>
+	<ctype.h>
+
