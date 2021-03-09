@@ -16,10 +16,12 @@ typedef struct Tonel
 
 typedef struct Lote
 {
-    struct Tonel tonel;
+    Tonel tonel;
     int tubo;
 } Lote;
 
+
+//prótotipos das funções
 void clear_keyboard_buffer(void);
 void caractereEspecial(void);
 void construtorLote(Lote*);
@@ -122,6 +124,7 @@ int main()
 
 // Métodos
 
+//Função para limpar o buffer do teclado
 void clear_keyboard_buffer()
 {
     int c = 0;
@@ -129,12 +132,14 @@ void clear_keyboard_buffer()
     return;
 }
 
+// método para permitir caracteres especiais no programa
 void caractereEspecial()
 {
     printf("%s",setlocale(LC_ALL,""));
     system("cls");
 }
 
+//  função para inicializar o estoque com 0
 void construtorLote(Lote *lote)
 {
     for (int i = 0; i < numeroLotes; i++)
@@ -147,6 +152,7 @@ void construtorLote(Lote *lote)
     }
 }
 
+// função para tratar erros
 void mensagemDeErro(int tipo)
 {
     system("cls");
@@ -162,10 +168,15 @@ void mensagemDeErro(int tipo)
     case 2:
         printf("O valor inserido é maior do que o espaço disponível!\n\n");
         break;
+    case 3:
+        printf("Erro na retirada de materiais!\n\n");
+        break;
     }
+
     system("pause");
 }
 
+// função para retirar todos os materiais de dado lote
 void retirarTodoMaterial(Lote *lote, int posicao)
 {
     if (posicao >= 0 && posicao < 20)
@@ -181,11 +192,11 @@ void retirarTodoMaterial(Lote *lote, int posicao)
     }
     else
     {
-        system("cls");
-        printf("Erro na retirada de materiais!\n\n");
-        system("pause");
+        mensagemDeErro(3);
     }
 }
+
+// função para retirar um material de um lote específico
 void retirarMaterial(Lote *lote, int posicao, int quantidade, char *material)
 {
 
@@ -266,6 +277,7 @@ void retirarMaterial(Lote *lote, int posicao, int quantidade, char *material)
     }
 }
 
+// Método para verificar se um lote específico está cheio
 int verificaEspaco(Lote *lote, int *posicao, int *quantidade, char *material)
 {
     if (strcmp(material, "areia") == 0 || strcmp(material, "cal") == 0 || strcmp(material, "cimento") == 0|| strcmp(material, "saibro") == 0)
@@ -302,11 +314,13 @@ void rastreiaLotes(Lote *lote, int quantidade, char *material)
     }
 }
 
+// Método para retornar o totald e toneis de um lote
 int totalToneis(Lote *lote, int posicao)
 {
     return lote[posicao].tonel.areia + lote[posicao].tonel.cal + lote[posicao].tonel.cimento + lote[posicao].tonel.saibro;
 }
 
+// Função para escrever o total de cada material no deposito
 void totalNoDeposito(Lote *lote)
 {
     int somaAreia = 0, somaCal = 0, somaCimento = 0, somaSaibro = 0, somaTubo = 0;
@@ -329,6 +343,7 @@ void totalNoDeposito(Lote *lote)
     system("pause");
 }
 
+// Função para listar os lotes com um material específico
 void listaLotes(Lote *lote, char *material)
 {
     system("cls");
@@ -389,6 +404,7 @@ void listaLotes(Lote *lote, char *material)
     system("pause");
 }
 
+// Função para adicionar um material
 void adicionarMaterial(Lote *lote, int posicao, int quantidade, char *material)
 {
     system("cls");
@@ -468,6 +484,7 @@ void adicionarMaterial(Lote *lote, int posicao, int quantidade, char *material)
     }
 }
 
+// função para transformar um String em minuscula
 void stringMinuscula(char *string)
 {
     for (int i = 0; i < strlen(string); i++)
