@@ -6,9 +6,6 @@
 #define numeroLotes 20
 #include <ctype.h>
 
-
-
-
 typedef struct Tonel
 {
     int cimento, areia, cal, saibro;
@@ -19,7 +16,6 @@ typedef struct Lote
     Tonel tonel;
     int tubo;
 } Lote;
-
 
 //prótotipos das funções
 void clear_keyboard_buffer(void);
@@ -35,6 +31,8 @@ int totalToneis(Lote*, int);
 void totalNoDeposito(Lote*);
 void listaLotes(Lote*, char*);
 void stringMinuscula(char*);
+int verificaMaterial(Lote*, char*);
+void printLote(Lote*, int);
 
 int main()
 {
@@ -47,7 +45,7 @@ int main()
         char material[10] = "";
         int posicaoLote, quantidade;
         system("cls");
-        printf("----------------Controle de Estoque----------------\n\n");
+        printf("---------------------Controle de Estoque---------------------\n\n");
         printf("0 - sair.\n");
         printf("1 - Adicionar material ao estoque.\n");
         printf("2 - Retirar material.\n");
@@ -65,6 +63,11 @@ int main()
             printf("Material: ");
             clear_keyboard_buffer();
             gets(material);
+            if (verificaMaterial(lote, material) == -1)
+            {
+                mensagemDeErro(0);
+                break;
+            }
             printf("\nQuantidade: ");
             scanf("%d", &quantidade);
 
@@ -90,6 +93,11 @@ int main()
                 printf("Material: ");
                 clear_keyboard_buffer();
                 gets(material);
+                if (verificaMaterial(lote, material) == -1)
+                {
+                    mensagemDeErro(0);
+                    break;
+                }
                 printf("\nQuantidade: ");
                 scanf("%d", &quantidade);
                 printf("\nLote: ");
@@ -112,9 +120,15 @@ int main()
             printf("Entre com o material que deseja procurar: ");
             clear_keyboard_buffer();
             gets(material);
+            if (verificaMaterial(lote, material) == -1)
+                mensagemDeErro(0);
             listaLotes(lote, material);
             break;
         case 5:
+            system("cls");
+            printf("Entre com o Lote que deseja visualizar: ");
+            scanf("%d", &posicaoLote);
+            printLote(lote, posicaoLote - 1);
             break;
         default:
             break;
@@ -122,7 +136,11 @@ int main()
     }
 }
 
-// Métodos
+
+
+// ---------Métodos---------
+
+
 
 //Função para limpar o buffer do teclado
 void clear_keyboard_buffer()
@@ -172,7 +190,6 @@ void mensagemDeErro(int tipo)
         printf("Erro na retirada de materiais!\n\n");
         break;
     }
-
     system("pause");
 }
 
@@ -196,106 +213,32 @@ void retirarTodoMaterial(Lote *lote, int posicao)
     }
 }
 
-// função para retirar um material de um lote específico
-void retirarMaterial(Lote *lote, int posicao, int quantidade, char *material)
-{
-
-    system("cls");
-    for (int i = 0; i < strlen(material); i++)
-    {
-        material[i] = tolower(material[i]);
-    }
-
-    if (strcmp(material, "areia") == 0)
-    {
-        if (lote[posicao].tonel.areia < quantidade)
-        {
-            mensagemDeErro(1);
-        }
-        else
-        {
-            lote[posicao].tonel.areia -= quantidade;
-            printf("%s retirado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
-    }
-    else if (strcmp(material, "cal") == 0)
-    {
-        if (lote[posicao].tonel.cal < quantidade)
-        {
-            mensagemDeErro(1);
-        }
-        else
-        {
-            lote[posicao].tonel.cal -= quantidade;
-            printf("%s retirado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
-    }
-    else if (strcmp(material, "cimento") == 0)
-    {
-        if (lote[posicao].tonel.cimento < quantidade)
-        {
-            mensagemDeErro(1);
-        }
-        else
-        {
-            lote[posicao].tonel.cimento -= quantidade;
-            printf("%s retirado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
-    }
-    else if (strcmp(material, "saibro") == 0)
-    {
-        if (lote[posicao].tonel.saibro < quantidade)
-        {
-            mensagemDeErro(1);
-        }
-        else
-        {
-            lote[posicao].tonel.saibro -= quantidade;
-            printf("%s retirado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
-    }
-    else if (strcmp(material, "tubo") == 0)
-    {
-        if (lote[posicao].tubo < quantidade)
-        {
-            mensagemDeErro(1);
-        }
-        else
-        {
-            lote[posicao].tubo -= quantidade;
-            printf("%s retirado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
-    }
-    else
-    {
-        mensagemDeErro(0);
-    }
-}
-
 // Método para verificar se um lote específico está cheio
 int verificaEspaco(Lote *lote, int *posicao, int *quantidade, char *material)
 {
-    if (strcmp(material, "areia") == 0 || strcmp(material, "cal") == 0 || strcmp(material, "cimento") == 0|| strcmp(material, "saibro") == 0)
+    if (verificaMaterial(lote, material) == 0)
     {
         if (totalToneis(lote, *posicao) + *quantidade > 20)
         {
             return 0;
         }
-
+        else
+        {
+            return 1;
+        }
     }
-    if (strcmp(material, "tubo") == 0)
+    if (verificaMaterial(lote, material) == 1)
     {
         if (lote[*posicao].tubo + *quantidade > 100)
         {
             return 0;
         }
+        else
+        {
+            return 1;
+        }
     }
-    return 1;
+    return 0;
 }
 
 void rastreiaLotes(Lote *lote, int quantidade, char *material)
@@ -314,7 +257,7 @@ void rastreiaLotes(Lote *lote, int quantidade, char *material)
     }
 }
 
-// Método para retornar o totald e toneis de um lote
+// Método para retornar o total de toneis de um lote
 int totalToneis(Lote *lote, int posicao)
 {
     return lote[posicao].tonel.areia + lote[posicao].tonel.cal + lote[posicao].tonel.cimento + lote[posicao].tonel.saibro;
@@ -408,80 +351,76 @@ void listaLotes(Lote *lote, char *material)
 void adicionarMaterial(Lote *lote, int posicao, int quantidade, char *material)
 {
     system("cls");
+    int aux_verificaMaterial = verificaMaterial(lote, material);
+    switch (aux_verificaMaterial)
+    {
+    case 0:
+        if (quantidade + totalToneis(lote, posicao) > 20)
+        {
+            mensagemDeErro(2);
+            break;
+        }
+        else
+        {
+            if (strcmp(material, "areia") == 0)
+            {
+                lote[posicao].tonel.areia += quantidade;
+            }
+            else if (strcmp(material, "cal") == 0)
+            {
+                lote[posicao].tonel.cal += quantidade;
+            }
+            else if (strcmp(material, "cimento") == 0)
+            {
+                lote[posicao].tonel.cimento += quantidade;
+            }
+            else if (strcmp(material, "saibro") == 0)
+            {
+                lote[posicao].tonel.saibro += quantidade;
+            }
+        }
+        break;
+    case 1:
+        lote[posicao].tubo += quantidade;
+        break;
+    }
+    printf("Quantidade: %d\n", quantidade);
+    printf("Material: %s\n", material);
+    printf("Lote: %d\n\n", posicao + 1);
+    printf("Adicionado com sucesso!\n");
+    system("pause");
+}
 
+// função para retirar um material de um lote específico
+void retirarMaterial(Lote *lote, int posicao, int quantidade, char *material)
+{
     stringMinuscula(material);
-
-    if (strcmp(material, "areia") == 0)
+    system("cls");
+    if (strcmp(material, "areia") == 0 && quantidade < lote[posicao].tonel.areia)
     {
-        if (quantidade + totalToneis(lote, posicao) > 20)
-        {
-            mensagemDeErro(2);
-        }
-        else
-        {
-            lote[posicao].tonel.areia += quantidade;
-            printf("%s adicionado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
-
+        lote[posicao].tonel.areia -= quantidade;
     }
-    else if (strcmp(material, "cal") == 0)
+    else if (strcmp(material, "cal") == 0 && quantidade < lote[posicao].tonel.cal)
     {
-        if (quantidade + totalToneis(lote, posicao) > 20)
-        {
-            mensagemDeErro(2);
-        }
-        else
-        {
-            lote[posicao].tonel.cal += quantidade;
-            printf("%s adicionado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
-
+        lote[posicao].tonel.cal -= quantidade;
     }
-    else if (strcmp(material, "cimento") == 0)
+    else if (strcmp(material, "cimento") == 0 && quantidade < lote[posicao].tonel.cimento)
     {
-        if (quantidade + totalToneis(lote, posicao) > 20)
-        {
-            mensagemDeErro(1);
-        }
-        else
-        {
-            lote[posicao].tonel.cimento += quantidade;
-            printf("%s adicionado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
+        lote[posicao].tonel.cimento -= quantidade;
     }
-    else if (strcmp(material, "saibro") == 0)
+    else if (strcmp(material, "saibro") == 0 && quantidade < lote[posicao].tonel.saibro)
     {
-        if (quantidade + totalToneis(lote, posicao) > 20)
-        {
-            mensagemDeErro(1);
-        }
-        else
-        {
-            lote[posicao].tonel.saibro += quantidade;
-            printf("%s adicionado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
+        lote[posicao].tonel.saibro -= quantidade;
     }
-    else if (strcmp(material, "tubo") == 0)
+    else if (strcmp(material, "tubo") == 0 && quantidade < lote[posicao].tubo)
     {
-        if (quantidade + lote[posicao].tubo > 100)
-        {
-            mensagemDeErro(2);
-        }
-        else
-        {
-            lote[posicao].tubo += quantidade;
-            printf("%s adicionado no lote %d com sucesso!\n\n", material, posicao + 1);
-            system("pause");
-        }
+        lote[posicao].tubo += quantidade;
     }
-    else
-    {
-        mensagemDeErro(0);
-    }
+    printf("Quantidade: %d\n", quantidade);
+    printf("Material: %s\n", material);
+    printf("Lote: %d\n\n", posicao + 1);
+    printf("Retirado com sucesso!\n");
+    system("pause");
 }
 
 // função para transformar um String em minuscula
@@ -491,4 +430,36 @@ void stringMinuscula(char *string)
     {
         string[i] = tolower(string[i]);
     }
+}
+
+// Método para verificar se um material pertence a prateleira dos tubos ou toneis
+int verificaMaterial(Lote *lote, char *material)
+{
+    stringMinuscula(material);
+
+    if (strcmp(material, "areia") == 0 || strcmp(material, "cal") == 0 || strcmp(material, "cimento") == 0 || strcmp(material, "saibro") == 0)
+    {
+        return 0;
+    }
+    else if (strcmp(material, "tubo") == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+// Função para printar um lote específico
+void printLote(Lote *lote, int posicao)
+{
+    system("cls");
+    printf("Lote %d\n\n", posicao + 1);
+    printf("Areia: %d\n", lote[posicao].tonel.areia);
+    printf("Cal: %d\n", lote[posicao].tonel.cal);
+    printf("Cimento: %d\n", lote[posicao].tonel.cimento);
+    printf("Saibro: %d\n", lote[posicao].tonel.saibro);
+    printf("Tubo: %d\n", lote[posicao].tubo);
+    system("pause");
 }
